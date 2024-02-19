@@ -1,0 +1,158 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+model User {
+  user_id            Int                  @id @default(autoincrement())
+  username           String?              @unique
+  email              String?              @unique
+  password           String?
+  phone              String?              @unique
+  first_name         String?
+  last_name          String?
+  dob                DateTime?
+  governorate        String?
+  district           String?
+  role               Role
+  is_deleted         Boolean              @default(false)
+  is_blocked         Boolean              @default(false)
+  created_at         DateTime             @default(now())
+  updated_at         DateTime             @updatedAt
+  created_by         Int?
+  StudentInfo        StudentInfo[]
+  TeacherInfo        TeacherInfo[]
+  Course             Course[]
+  CourseEnrollment   CourseEnrollment[]
+  StudentInstallment StudentInstallment[]
+  LoginHistory       LoginHistory[]
+
+  @@map("users")
+}
+
+model StudentInfo {
+  student_number Int     @id @default(autoincrement())
+  student_id     Int
+  created_by     Int
+  student        User    @relation(fields: [student_id], references: [user_id])
+  parent_name    String
+  parent_phone   String  @unique
+  parent_phone2  String? @unique
+
+  @@map("students_info")
+}
+
+model TeacherInfo {
+  teacher_number Int  @id @default(autoincrement())
+  user_id        Int
+  created_by     Int
+  teacher        User @relation(fields: [user_id], references: [user_id])
+
+  @@map("teachers_info")
+}
+
+model Class {
+  class_id    Int       @id @default(autoincrement())
+  created_by  Int
+  class_name  String
+  description String?
+  is_deleted  Boolean   @default(false)
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  Subject     Subject[]
+
+  @@map("classes")
+}
+
+model Subject {
+  subject_id   Int      @id @default(autoincrement())
+  class_id     Int
+  created_by   Int
+  subject_name String
+  description  String?
+  is_deleted   Boolean  @default(false)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  class        Class    @relation(fields: [class_id], references: [class_id])
+  Course       Course[]
+
+  @@map("subjects")
+}
+
+model Course {
+  course_id          Int                  @id @default(autoincrement())
+  created_by         Int
+  teacher_id         Int
+  subject_id         Int
+  course_name        String               @unique
+  course_price       Float
+  course_desc        String?
+  course_image_url   String?
+  is_deleted         Boolean              @default(false)
+  created_at         DateTime             @default(now())
+  updated_at         DateTime             @updatedAt
+  subject            Subject              @relation(fields: [subject_id], references: [subject_id])
+  teacher            User                 @relation(fields: [teacher_id], references: [user_id])
+  CourseEnrollment   CourseEnrollment[]
+  StudentInstallment StudentInstallment[]
+
+  @@map("courses")
+}
+
+model CourseEnrollment {
+  enrollment_number Int      @id @default(autoincrement())
+  student_id        Int
+  course_id         Int
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+  student           User     @relation(fields: [student_id], references: [user_id])
+  course            Course   @relation(fields: [course_id], references: [course_id])
+
+  @@map("course_enrollments")
+}
+
+model StudentInstallment {
+  installment_number Int       @id @default(autoincrement())
+  student_id         Int
+  course_id          Int
+  due_date           DateTime
+  paid_amount        Float
+  paid_date          DateTime?
+  old_amount         Float?
+  is_paid            Boolean   @default(false)
+  is_deleted         Boolean   @default(false)
+  created_by         Int
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+  student            User      @relation(fields: [student_id], references: [user_id])
+  course             Course    @relation(fields: [course_id], references: [course_id])
+
+  @@map("student_installments")
+}
+
+model LoginHistory {
+  login_id    Int       @id @default(autoincrement())
+  user_id     Int
+  login_time  DateTime  @default(now())
+  logout_time DateTime?
+  ip_address  String
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  user        User      @relation(fields: [user_id], references: [user_id])
+
+  @@map("login_history")
+}

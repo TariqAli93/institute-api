@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <title>استعادة كلمة المرور</title>
+  </head>
+  <body>
+    <h2>مرحبا بكـ ${data.username}</h2>
+    <p>
+      لقد طلبت مؤخرًا إعادة تعيين كلمة المرور الخاصة بحسابك. انقر على الزر أدناه
+      لإعادة تعيينها.
+    </p>
+    <a
+      href="${process.env.CLIENT_URL}/reset_password/${token}"
+      style="
+        background-color: #008cba;
+        color: white;
+        padding: 14px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+      "
+      >استعادة كلمة المرور</a
+    >
+    <p>
+      إذا لم تطلب إعادة تعيين كلمة المرور، يرجى تجاهل هذا البريد الإلكتروني أو
+      الرد لإعلامنا. هذا إعادة تعيين كلمة المرور صالحة فقط للـ 60 دقيقة القادمة.
+    </p>
+    <p>شكرا لك</p>
+  </body>
+</html>
