@@ -8,7 +8,7 @@ export const prismaErrorHandling = (err, errorCode) => {
     return {
       error: "Bad Request",
       code: 400,
-      errorMessage: err.message,
+      errorMessage: err,
     };
   }
 
@@ -17,7 +17,7 @@ export const prismaErrorHandling = (err, errorCode) => {
       return {
         error: "Not Found",
         code: 404,
-        errorMessage: err.message,
+        errorMessage: err,
       };
     }
     if (err?.code == "P2003") {
