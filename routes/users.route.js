@@ -7,6 +7,8 @@ const userRoutes = app => {
   app.get("/students/:id", Users.FindStudentById);
   app.get("/teachers", Users.FindTeachers);
   app.get("/teachers/:id", Users.FindTeacherById);
+  app.post("/users/create", Users.RegisterUsers);
+  app.put("/users/update/:id", Users.UpdateUsers);
   app.post("/login", Users.LoginHandler);
 };
 

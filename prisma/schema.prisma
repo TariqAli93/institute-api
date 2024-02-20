@@ -19,10 +19,10 @@ enum Role {
 
 model User {
   user_id            Int                  @id @default(autoincrement())
-  username           String?              @unique
-  email              String?              @unique
+  username           String?
+  email              String?
   password           String?
-  phone              String?              @unique
+  phone              String?
   first_name         String?
   last_name          String?
   dob                DateTime?

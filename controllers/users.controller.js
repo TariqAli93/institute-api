@@ -167,7 +167,7 @@ export default class Users {
     }
   }
 
-  static async UpdateUser(req, res) {
+  static async UpdateUsers(req, res) {
     try {
       const { first_name, last_name, phone, email, role, dob, governorate, district, username } = req.body;
       const { user_id } = req.params;
