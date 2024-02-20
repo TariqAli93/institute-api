@@ -152,39 +152,44 @@ export default class Users {
 
   static async RegisterUsers(req, res) {
     try {
-      const { username, password, role } = req.body;
+      const { password, role } = req.body;
 
       const salt = await bycrypt.genSalt(10);
       const hashedPassword = await bycrypt.hash(password, salt);
 
-      await prisma.user.create({
-        data: { username: username, password: hashedPassword, role: role },
-      });
+      const uniques = {
+        username: await prisma.user.count({ where: { username: req.body.username } }),
+        phone: await prisma.user.count({ where: { phone: req.body.phone } }),
+        email: await prisma.user.count({ where: { email: req.body.email } }),
+      };
 
-      res.status(201).send("تم انشاء الحساب بنجاح");
+      if (uniques.username > 0) return res.status(409).send("اسم المستخدم موجود مسبقا");
+      else if (uniques.email > 0) return res.status(409).send("البريد الالكتروني موجود مسبقا");
+      else if (uniques.phone > 0) return res.status(409).send("رقم الهاتف موجود مسبقا");
+      else if (req.body.role !== undefined && req.body.role !== "ADMIN" && req.body.role !== "USER") return res.status(400).send("الرجاء اختيار دور المستخدم");
+      else {
+        await prisma.user.create({
+          data: {
+            ...req.body,
+            password: hashedPassword,
+            role: role,
+          },
+        });
+
+        res.status(201).send("تم انشاء الحساب بنجاح");
+      }
     } catch (e) {
-      res.status(500).send(prismaErrorHandling(e));
+      res.status(prismaErrorHandling(e).code).send(prismaErrorHandling(e).error);
     }
   }
 
   static async UpdateUsers(req, res) {
     try {
-      const { first_name, last_name, phone, email, role, dob, governorate, district, username } = req.body;
-      const { user_id } = req.params;
+      const { id } = req.params;
 
       await prisma.user.update({
-        where: { user_id: parseInt(user_id) },
-        data: {
-          username: username,
-          role: role,
-          email: email,
-          first_name: first_name,
-          last_name: last_name,
-          phone: phone,
-          governorate: governorate,
-          district: district,
-          dob: dob,
-        },
+        where: { user_id: parseInt(id) },
+        data: req.body,
       });
 
       res.status(201).send("تم تعديل الحساب بنجاح");
