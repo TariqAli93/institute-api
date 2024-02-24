@@ -25,7 +25,7 @@ model User {
   phone              String?
   first_name         String?
   last_name          String?
-  dob                DateTime?
+  dob                String?
   governorate        String?
   district           String?
   role               Role
@@ -33,41 +33,35 @@ model User {
   is_blocked         Boolean              @default(false)
   created_at         DateTime             @default(now())
   updated_at         DateTime             @updatedAt
-  created_by         Int?
-  StudentInfo        StudentInfo[]
-  TeacherInfo        TeacherInfo[]
   Course             Course[]
   CourseEnrollment   CourseEnrollment[]
   StudentInstallment StudentInstallment[]
-  LoginHistory       LoginHistory[]
+  Students           Students[]
+  Teachers           Teachers[]
 
   @@map("users")
 }
 
-model StudentInfo {
-  student_number Int     @id @default(autoincrement())
-  student_id     Int
-  created_by     Int
-  student        User    @relation(fields: [student_id], references: [user_id])
-  parent_name    String
-  parent_phone   String  @unique
-  parent_phone2  String? @unique
+model Students {
+  student_id    Int     @id @default(autoincrement())
+  user_id       Int
+  student       User    @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  parent_phone  String?
+  parent_phone2 String?
 
-  @@map("students_info")
+  @@map("students")
 }
 
-model TeacherInfo {
-  teacher_number Int  @id @default(autoincrement())
-  user_id        Int
-  created_by     Int
-  teacher        User @relation(fields: [user_id], references: [user_id])
+model Teachers {
+  teacher_id Int  @id @default(autoincrement())
+  user_id    Int
+  teacher    User @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
-  @@map("teachers_info")
+  @@map("teachers")
 }
 
 model Class {
   class_id    Int       @id @default(autoincrement())
-  created_by  Int
   class_name  String
   description String?
   is_deleted  Boolean   @default(false)
@@ -81,13 +75,12 @@ model Class {
 model Subject {
   subject_id   Int      @id @default(autoincrement())
   class_id     Int
-  created_by   Int
   subject_name String
   description  String?
   is_deleted   Boolean  @default(false)
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
-  class        Class    @relation(fields: [class_id], references: [class_id])
+  class        Class    @relation(fields: [class_id], references: [class_id], onDelete: Cascade)
   Course       Course[]
 
   @@map("subjects")
@@ -95,7 +88,6 @@ model Subject {
 
 model Course {
   course_id          Int                  @id @default(autoincrement())
-  created_by         Int
   teacher_id         Int
   subject_id         Int
   course_name        String               @unique
@@ -105,8 +97,8 @@ model Course {
   is_deleted         Boolean              @default(false)
   created_at         DateTime             @default(now())
   updated_at         DateTime             @updatedAt
-  subject            Subject              @relation(fields: [subject_id], references: [subject_id])
-  teacher            User                 @relation(fields: [teacher_id], references: [user_id])
+  subject            Subject              @relation(fields: [subject_id], references: [subject_id], onDelete: Cascade)
+  teacher            User                 @relation(fields: [teacher_id], references: [user_id], onDelete: Cascade)
   CourseEnrollment   CourseEnrollment[]
   StudentInstallment StudentInstallment[]
 
@@ -119,8 +111,8 @@ model CourseEnrollment {
   course_id         Int
   created_at        DateTime @default(now())
   updated_at        DateTime @updatedAt
-  student           User     @relation(fields: [student_id], references: [user_id])
-  course            Course   @relation(fields: [course_id], references: [course_id])
+  student           User     @relation(fields: [student_id], references: [user_id], onDelete: Cascade)
+  course            Course   @relation(fields: [course_id], references: [course_id], onDelete: Cascade)
 
   @@map("course_enrollments")
 }
@@ -135,24 +127,10 @@ model StudentInstallment {
   old_amount         Float?
   is_paid            Boolean   @default(false)
   is_deleted         Boolean   @default(false)
-  created_by         Int
   created_at         DateTime  @default(now())
   updated_at         DateTime  @updatedAt
-  student            User      @relation(fields: [student_id], references: [user_id])
-  course             Course    @relation(fields: [course_id], references: [course_id])
+  student            User      @relation(fields: [student_id], references: [user_id], onDelete: Cascade)
+  course             Course    @relation(fields: [course_id], references: [course_id], onDelete: Cascade)
 
   @@map("student_installments")
-}
-
-model LoginHistory {
-  login_id    Int       @id @default(autoincrement())
-  user_id     Int
-  login_time  DateTime  @default(now())
-  logout_time DateTime?
-  ip_address  String
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
-  user        User      @relation(fields: [user_id], references: [user_id])
-
-  @@map("login_history")
 }

@@ -1,10 +1,12 @@
 import jwt from "jsonwebtoken";
 
-const checkAuth = (req, res, next) => {
+const isAdmin = (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(" ")[1] !== undefined ? req.headers.authorization.split(" ")[1] : "";
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
+    if (decoded.role !== "ADMIN") {
+      return res.status(403).send("غير مصرح لك بالدخول");
+    }
     next();
   } catch (error) {
     const errors = {
@@ -17,5 +19,3 @@ const checkAuth = (req, res, next) => {
     return res.status(401).send(TransError);
   }
 };
-
-export default checkAuth;

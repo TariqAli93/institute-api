@@ -2,13 +2,11 @@ import Users from "../controllers/users.controller.js";
 
 const userRoutes = app => {
   app.get("/users", Users.FindUsers);
+  app.post("/users", Users.RegisterUsers);
   app.get("/users/:id", Users.FindUserById);
-  app.get("/students", Users.FindStudents);
-  app.get("/students/:id", Users.FindStudentById);
-  app.get("/teachers", Users.FindTeachers);
-  app.get("/teachers/:id", Users.FindTeacherById);
-  app.post("/users/create", Users.RegisterUsers);
-  app.put("/users/update/:id", Users.UpdateUsers);
+  app.put("/users/:id", Users.UpdateUsers);
+  app.put("/users/trash/:id", Users.SoftDelete);
+  app.delete("/users/:id", Users.HardDelete);
   app.post("/login", Users.LoginHandler);
 };
 
